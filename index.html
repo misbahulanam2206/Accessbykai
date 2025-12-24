@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access By KAI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f2f6fa;
+    margin: 0;
+}
+
+.app {
+    max-width: 420px;
+    margin: auto;
+    background: white;
+    min-height: 100vh;
+}
+
+header {
+    background: #0f4c81;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.page {
+    display: none;
+    padding: 20px;
+}
+
+.page.active {
+    display: block;
+}
+
+.center-img {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.center-img img {
+    width: 150px;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+button {
+    background: #0f4c81;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.link {
+    text-align: center;
+    margin-top: 10px;
+    color: #0f4c81;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 15px;
+}
+
+.qr {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<header>Access By KAI</header>
+
+<!-- LOGIN -->
+<div class="page active" id="login">
+    <div class="center-img">
+        <img src="img/KAI.jpg" alt="Kereta Api Indonesia">
+    </div>
+    <h3>Login</h3>
+    <input id="loginUser" placeholder="Username">
+    <input id="loginPass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="link" onclick="show('register')">Belum punya akun? Daftar</div>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="register">
+    <div class="center-img">
+        <img src="img/KAI.jpg" alt="Kereta Api Indonesia">
+    </div>
+    <h3>Register</h3>
+    <input id="regUser" placeholder="Username">
+    <input id="regPass" type="password" placeholder="Password">
+    <button onclick="register()">Daftar</button>
+    <div class="link" onclick="show('login')">Sudah punya akun? Login</div>
+</div>
+
+<!-- BOOKING -->
+<div class="page" id="booking">
+    <div class="center-img">
+        <img src="img/KAI.jpg" alt="Kereta Api Indonesia">
+    </div>
+    <h3>Pesan Tiket</h3>
+    <input id="nama" placeholder="Nama Penumpang">
+    <input id="identitas" placeholder="NIK / Passport">
+    <select id="kereta">
+        <option>Argo Bromo Anggrek</option>
+        <option>Taksaka</option>
+        <option>Gajayana</option>
+        <option>Bima</option>
+        <option>Fajar utama Yogyakarta</option>
+    </select>
+    <input id="seat" placeholder="Nomor Kursi (5A)">
+    <button onclick="kePembayaran()">Lanjut Pembayaran</button>
+</div>
+
+<!-- PAYMENT -->
+<div class="page" id="payment">
+    <div class="center-img">
+        <img src="img/KAI.jpg" alt="Kereta Api Indonesia">
+    </div>
+    <h3>Pembayaran</h3>
+    <select>
+        <option>QRIS</option>
+        <option>Transfer Bank</option>
+        <option>E-Wallet</option>
+    </select>
+    <button onclick="bayar()">Bayar Sekarang</button>
+</div>
+
+<!-- TICKET -->
+<div class="page" id="ticket">
+    <h3>E-Tiket</h3>
+    <div class="card">
+        <div class="center-img">
+            <img src="img/KAI.jpg" alt="Kereta Api Indonesia">
+        </div>
+        <p><b>Nama:</b> <span id="tNama"></span></p>
+        <p><b>Kereta:</b> <span id="tKereta"></span></p>
+        <p><b>Kursi:</b> <span id="tSeat"></span></p>
+        <p><b>Kode Booking:</b> <span id="tBooking"></span></p>
+        <div class="qr" id="qrcode"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// REGISTER
+function register() {
+    if (!regUser.value || !regPass.value) return alert("Lengkapi data!");
+    localStorage.setItem("user", regUser.value);
+    localStorage.setItem("pass", regPass.value);
+    alert("Registrasi berhasil!");
+    show("login");
+}
+
+// LOGIN
+function login() {
+    if (
+        loginUser.value === localStorage.getItem("user") &&
+        loginPass.value === localStorage.getItem("pass")
+    ) {
+        show("booking");
+    } else {
+        alert("Username atau password salah!");
+    }
+}
+
+// BOOKING
+function kePembayaran() {
+    if (!nama.value || !identitas.value || !seat.value)
+        return alert("Lengkapi data!");
+    show("payment");
+}
+
+// PAYMENT
+function bayar() {
+    let booking = "KAI-" + Math.floor(Math.random()*900000+100000);
+    tNama.innerText = nama.value;
+    tKereta.innerText = kereta.value;
+    tSeat.innerText = seat.value;
+    tBooking.innerText = booking;
+
+    qrcode.innerHTML = "";
+    new QRCode(qrcode, {
+        text: `${nama.value}|${kereta.value}|${seat.value}|${booking}`,
+        width: 160,
+        height: 160
+    });
+
+    show("ticket");
+}
+</script>
+
+</body>
+</html>
